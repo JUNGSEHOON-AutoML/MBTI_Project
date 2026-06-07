@@ -1,0 +1,2 @@
+I have uploaded the dataset for this project on the google drive, in order to make it accessible while using the gooogle Colab GPU. 
+Link : https://drive.google.com/file/d/1ahF29-DHnM3VrAcL0MjdUEivJxUNOTqF/view?usp=drive_link

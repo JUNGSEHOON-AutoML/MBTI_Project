@@ -1,0 +1,7 @@
+pandas
+nltk
+transformers
+scikit-learn
+tqdm
+kaggle
+joblib
