@@ -6,7 +6,7 @@ import pandas as pd
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 
-# Worker function for parallel text cleaning
+# Worker function for parallel text cleaning (1차 전처리)
 def clean_texts_batch(texts):
     # Setup NLTK resources inside the process worker
     import re
@@ -42,7 +42,7 @@ def clean_texts_batch(texts):
         cleaned_batch.append(cleaned_tokens)
     return cleaned_batch
 
-def parallel_clean(texts, num_workers=4, chunk_size=5000):
+def parallel_clean(texts, num_workers=4, chunk_size=500):
     total = len(texts)
     chunks = [texts[i:i + chunk_size] for i in range(0, total, chunk_size)]
     results = []
@@ -70,47 +70,41 @@ def main():
     print("==================================================")
     
     mbti_path = '/data/mbti_1.csv'
-    msg_path = '/data/ForumMessages.csv'
+    mbti_500_path = '/data/MBTI 500.csv'
     output_path = '/data/final_preprocessed_mbti.csv'
     
-    if not os.path.exists(mbti_path) or not os.path.exists(msg_path):
+    if not os.path.exists(mbti_path) or not os.path.exists(mbti_500_path):
         print(f"ERROR: Dataset files missing in /data. Please verify Phase 1 completed.")
         sys.exit(1)
         
     # 1. Load Datasets
     print("Loading datasets...")
     df_mbti = pd.read_csv(mbti_path)
-    df_msg = pd.read_csv(msg_path)
+    df_500 = pd.read_csv(mbti_500_path)
     
     print(f"Dataset 1 (mbti_1): {df_mbti.shape[0]} rows")
-    print(f"Dataset 2 (ForumMessages): {df_msg.shape[0]} rows")
+    print(f"Dataset 2 (MBTI 500): {df_500.shape[0]} rows")
     
     # Setup parallel workers count
     import multiprocessing
     num_workers = max(1, multiprocessing.cpu_count() - 1)
     
-    # 2. Preprocess Dataset 1 (mbti_1.csv)
+    # 2. Preprocess Dataset 1 (mbti_1.csv) - 1차 전처리
     print("\n--- Preprocessing Dataset 1 (mbti_1) ---")
     df_mbti['tokens'] = parallel_clean(df_mbti['posts'].tolist(), num_workers=num_workers, chunk_size=500)
     
-    # 3. Preprocess Dataset 2 (ForumMessages.csv)
-    print("\n--- Preprocessing Dataset 2 (ForumMessages) ---")
-    df_msg['tokens'] = parallel_clean(df_msg['message'].tolist(), num_workers=num_workers, chunk_size=10000)
+    # 3. Preprocess Dataset 2 (MBTI 500.csv) - 1차 전처리 완료 데이터이므로 단순 공백 분할(Tokenization)
+    print("\n--- Extracting tokens from Dataset 2 (MBTI 500) ---")
+    df_500['tokens'] = df_500['posts'].fillna('').apply(lambda x: str(x).split())
     
-    # 4. Map user_id to MBTI type
-    print("\nMapping Dataset 2 user_ids to MBTI types...")
-    # user_id is 1-indexed, corresponding to 0-indexed row of df_mbti
-    user_id_to_type = {i + 1: t for i, t in enumerate(df_mbti['type'])}
-    df_msg['type'] = df_msg['user_id'].map(user_id_to_type)
-    
-    # 5. Merge Datasets
-    print("Merging Datasets...")
+    # 4. Merge Datasets
+    print("\nMerging Datasets...")
     df1 = pd.DataFrame({'type': df_mbti['type'], 'tokens': df_mbti['tokens']})
-    df2 = pd.DataFrame({'type': df_msg['type'], 'tokens': df_msg['tokens']})
+    df2 = pd.DataFrame({'type': df_500['type'], 'tokens': df_500['tokens']})
     df_merged = pd.concat([df1, df2], ignore_index=True)
     print(f"Merged corpus size: {df_merged.shape[0]} rows")
     
-    # 6. Apply Phase 2, Part 2 Filters
+    # 5. Apply 2차 전처리 Filters
     print("\n--- Applying corpus-wide filters ---")
     
     # Filter A: Remove tokens of length <= 2
@@ -130,7 +124,7 @@ def main():
     print("Filtering out rare words (freq < 5)...")
     df_merged['tokens'] = df_merged['tokens'].apply(lambda tokens: [t for t in tokens if t in frequent_words])
     
-    # 7. Reconstruct cleaned posts string
+    # 6. Reconstruct cleaned posts string
     print("\nReconstructing text posts...")
     df_merged['posts'] = df_merged['tokens'].apply(lambda tokens: ' '.join(tokens))
     
