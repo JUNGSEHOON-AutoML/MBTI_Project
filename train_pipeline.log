@@ -1,0 +1,861 @@
+==================================================
+Starting MBTI Model Training Master Pipeline
+==================================================
+Pre-extracted BERT embeddings and labels found at /data. Skipping extract_embeddings.py.
+
+==================================================
+Executing: train_baseline.py
+==================================================
+[Parallel(n_jobs=-1)]: Using backend ThreadingBackend with 36 concurrent workers.
+[Parallel(n_jobs=-1)]: Done 100 out of 100 | elapsed:   37.9s finished
+[Parallel(n_jobs=36)]: Using backend ThreadingBackend with 36 concurrent workers.
+[Parallel(n_jobs=36)]: Done 100 out of 100 | elapsed:    0.3s finished
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+==================================================
+Stage 1 (Baseline): RandomForest on BERT Embeddings
+==================================================
+Loading embeddings and labels...
+Features shape: (174839, 768)
+Labels shape: (174839,)
+Training RandomForestClassifier...
+Evaluating baseline model...
+
+--- Classification Report (Stage 1 - RandomForest Baseline) ---
+              precision    recall  f1-score   support
+
+        ENFJ       0.12      0.00      0.01       771
+        ENFP       0.28      0.01      0.02      2745
+        ENTJ       0.24      0.00      0.01       936
+        ENTP       0.19      0.01      0.02      2804
+        ESFJ       0.00      0.00      0.00       174
+        ESFP       1.00      0.01      0.01       193
+        ESTJ       1.00      0.01      0.01       159
+        ESTP       0.22      0.01      0.01       359
+        INFJ       0.19      0.25      0.21      5934
+        INFP       0.23      0.62      0.34      7337
+        INTJ       0.17      0.08      0.11      4387
+        INTP       0.19      0.18      0.19      5242
+        ISFJ       0.17      0.01      0.01       671
+        ISFP       0.38      0.01      0.02      1078
+        ISTJ       0.36      0.01      0.01       830
+        ISTP       0.26      0.01      0.01      1348
+
+    accuracy                           0.21     34968
+   macro avg       0.31      0.08      0.06     34968
+weighted avg       0.22      0.21      0.15     34968
+
+==================================================
+SUCCESS: train_baseline.py completed in 39.7s
+
+==================================================
+Executing: train_finetune.py
+==================================================
+/opt/conda/lib/python3.10/site-packages/huggingface_hub/file_download.py:949: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+/opt/conda/lib/python3.10/site-packages/torch/cuda/__init__.py:546: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/opt/conda/lib/python3.10/site-packages/transformers/optimization.py:457: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+==================================================
+Stage 2 (Fine-tuning): BertForSequenceClassification
+==================================================
+Loading preprocessed dataset...
+Train samples: 139871, Validation samples: 34968
+Using device: cuda
+Fine-tuned model weights found at /data/bert_mbti_epoch2.pt. Skipping fine-tuning training loop.
+
+Loading Epoch 2 weights from /data/bert_mbti_epoch2.pt for final evaluation...
+Evaluating Epoch 2 model on validation set...
+
+--- Classification Report (Stage 2 - Fine-tuned BERT Epoch 2) ---
+Validation Accuracy: 0.3018
+              precision    recall  f1-score   support
+
+        INFJ       0.31      0.31      0.31      5934
+        ENTP       0.33      0.16      0.21      2804
+        INTP       0.28      0.38      0.32      5242
+        INTJ       0.37      0.17      0.23      4387
+        ENTJ       0.41      0.10      0.16       936
+        ENFP       0.48      0.15      0.23      2745
+        INFP       0.28      0.62      0.39      7337
+        ENFJ       0.41      0.09      0.14       771
+        ISFP       0.44      0.09      0.15      1078
+        ISFJ       0.53      0.08      0.13       671
+        ISTP       0.32      0.12      0.17      1348
+        ISTJ       0.36      0.11      0.16       830
+        ESTP       0.31      0.09      0.14       359
+        ESTJ       0.17      0.02      0.03       159
+        ESFP       0.00      0.00      0.00       193
+        ESFJ       0.32      0.05      0.08       174
+
+    accuracy                           0.30     34968
+   macro avg       0.33      0.16      0.18     34968
+weighted avg       0.33      0.30      0.27     34968
+
+==================================================
+SUCCESS: train_finetune.py completed in 92.5s
+
+==================================================
+Executing: train_binary.py
+==================================================
+==================================================
+Stage 3 & 4: Binary Logistic Regressions on Traits
+==================================================
+Loading embeddings and labels...
+
+--- Training Binary Model for I/E (Introversion vs Extraversion) ---
+Classification Report for I/E (Introversion vs Extraversion):
+              precision    recall  f1-score   support
+
+           E       0.54      0.01      0.01      8141
+           I       0.77      1.00      0.87     26827
+
+    accuracy                           0.77     34968
+   macro avg       0.65      0.50      0.44     34968
+weighted avg       0.71      0.77      0.67     34968
+
+
+--- Training Binary Model for N/S (Intuition vs Sensing) ---
+Classification Report for N/S (Intuition vs Sensing):
+              precision    recall  f1-score   support
+
+           S       0.33      0.00      0.00      4812
+           N       0.86      1.00      0.93     30156
+
+    accuracy                           0.86     34968
+   macro avg       0.60      0.50      0.46     34968
+weighted avg       0.79      0.86      0.80     34968
+
+
+--- Training Binary Model for F/T (Feeling vs Thinking) ---
+Classification Report for F/T (Feeling vs Thinking):
+              precision    recall  f1-score   support
+
+           T       0.59      0.49      0.53     16064
+           F       0.62      0.71      0.66     18904
+
+    accuracy                           0.61     34968
+   macro avg       0.60      0.60      0.60     34968
+weighted avg       0.60      0.61      0.60     34968
+
+
+--- Training Binary Model for P/J (Perceiving vs Judging) ---
+Classification Report for P/J (Perceiving vs Judging):
+              precision    recall  f1-score   support
+
+           J       0.52      0.11      0.18     13861
+           P       0.62      0.93      0.74     21107
+
+    accuracy                           0.61     34968
+   macro avg       0.57      0.52      0.46     34968
+weighted avg       0.58      0.61      0.52     34968
+
+==================================================
+SUCCESS: train_binary.py completed in 132.7s
+
+==================================================
+Executing: train_svc.py
+==================================================
+==================================================
+Stage 5: Multi-class SVC Hyperparameter Tuning
+==================================================
+Loading embeddings and labels...
+Training set size: 139871 samples
+Testing set size: 34968 samples
+
+Sampling 5,000 items for fast GridSearchCV...
+Initializing GridSearchCV for SVC...
+Fitting 3 folds for each of 12 candidates, totalling 36 fits
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3636
+obj = -880.008305, rho = 0.900510
+nSV = 1187, nBSV = 645
+*
+optimization finished, #iter = 543
+obj = -858.401014, rho = 0.453966
+nSV = 902, nBSV = 862
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3397
+obj = -879.540540, rho = 0.912703
+nSV = 1137, nBSV = 658
+*.*
+optimization finished, #iter = 726
+obj = -196.847861, rho = -1.033752
+nSV = 318, nBSV = 127
+*.*
+optimization finished, #iter = 667
+obj = -220.468376, rho = -0.968505
+nSV = 315, nBSV = 150
+*.*
+optimization finished, #iter = 644
+obj = -180.906797, rho = -1.045974
+nSV = 284, nBSV = 112
+*
+optimization finished, #iter = 582
+obj = -407.868106, rho = -1.119556
+nSV = 473, nBSV = 350
+.
+Warning: using -h 0 may be faster
+*......*
+optimization finished, #iter = 7068
+obj = -881.106868, rho = 0.958718
+nSV = 1599, nBSV = 527
+.
+Warning: using -h 0 may be faster
+*......*
+optimization finished, #iter = 7955
+obj = -881.189615, rho = 0.954994
+nSV = 1697, nBSV = 510
+.
+Warning: using -h 0 may be faster
+*....*
+optimization finished, #iter = 5095
+obj = -880.546979, rho = 0.914291
+nSV = 1310, nBSV = 598
+.
+Warning: using -h 0 may be faster
+*....*
+optimization finished, #iter = 5298
+obj = -880.758298, rho = 0.936308
+nSV = 1396, nBSV = 574
+*
+optimization finished, #iter = 469
+obj = -751.831405, rho = -1.021773
+nSV = 788, nBSV = 752
+*
+optimization finished, #iter = 817
+obj = -872.807547, rho = 0.869604
+nSV = 935, nBSV = 823
+*
+optimization finished, #iter = 481
+obj = -846.211330, rho = 0.371742
+nSV = 891, nBSV = 874
+*
+optimization finished, #iter = 831
+obj = -870.007961, rho = 0.937388
+nSV = 940, nBSV = 823
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3071
+obj = -1066.811488, rho = -0.972870
+nSV = 1312, nBSV = 861
+.
+Warning: using -h 0 may be faster
+*
+optimization finished, #iter = 1619
+obj = -2881.675934, rho = 0.563186
+nSV = 3027, nBSV = 2994
+*.*
+optimization finished, #iter = 1539
+obj = -197.501282, rho = -1.022778
+nSV = 474, nBSV = 104
+*.*
+optimization finished, #iter = 1726
+obj = -221.449705, rho = -0.987346
+nSV = 513, nBSV = 116
+*.*
+optimization finished, #iter = 1427
+obj = -181.486501, rho = -1.012002
+nSV = 432, nBSV = 96
+*..*
+optimization finished, #iter = 2281
+obj = -410.958112, rho = -1.005754
+nSV = 691, nBSV = 267
+...
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 8252
+obj = -3134.608403, rho = 0.930253
+nSV = 3541, nBSV = 2751
+.....
+Warning: using -h 0 may be faster
+*.......*
+optimization finished, #iter = 12131
+obj = -3136.315451, rho = 0.952908
+nSV = 3799, nBSV = 2588
+..
+Warning: using -h 0 may be faster
+*
+optimization finished, #iter = 2647
+obj = -3104.335600, rho = 0.793270
+nSV = 3235, nBSV = 3034
+..
+Warning: using -h 0 may be faster
+*.*
+optimization finished, #iter = 3626
+obj = -3121.560790, rho = 0.845045
+nSV = 3303, nBSV = 2989
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3627
+obj = -766.276345, rho = -0.961000
+nSV = 1083, nBSV = 535
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3898
+obj = -1228.695775, rho = -0.923509
+nSV = 1495, nBSV = 969
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3184
+obj = -947.231356, rho = -0.929319
+nSV = 1198, nBSV = 719
+.
+Warning: using -h 0 may be faster
+*.*
+optimization finished, #iter = 2058
+obj = -1531.526425, rho = -0.753891
+nSV = 1679, nBSV = 1411
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3412
+obj = -1067.145778, rho = 0.994156
+nSV = 1329, nBSV = 841
+*.*
+optimization finished, #iter = 797
+obj = -197.025427, rho = -1.008556
+nSV = 326, nBSV = 125
+*.*
+optimization finished, #iter = 853
+obj = -220.841709, rho = -0.958319
+nSV = 359, nBSV = 137
+*.*
+optimization finished, #iter = 725
+obj = -181.018840, rho = -1.000134
+nSV = 323, nBSV = 109
+*.*
+optimization finished, #iter = 879
+obj = -409.430939, rho = -1.020332
+nSV = 518, nBSV = 314
+.
+Warning: using -h 0 may be faster
+*.......*
+optimization finished, #iter = 8096
+obj = -1068.833259, rho = 0.986766
+nSV = 1767, nBSV = 666
+..
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 7940
+obj = -1068.845217, rho = 0.982507
+nSV = 1790, nBSV = 675
+.
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 6044
+obj = -1068.408666, rho = 0.994689
+nSV = 1570, nBSV = 740
+.
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 6692
+obj = -1068.576969, rho = 0.994727
+nSV = 1616, nBSV = 710
+*
+optimization finished, #iter = 569
+obj = -757.752765, rho = -0.947178
+nSV = 804, nBSV = 727
+*
+optimization finished, #iter = 612
+obj = -1028.806395, rho = 0.845681
+nSV = 1083, nBSV = 1058
+*
+optimization finished, #iter = 539
+obj = -931.813836, rho = -0.661484
+nSV = 968, nBSV = 930
+*
+optimization finished, #iter = 910
+obj = -1056.690284, rho = 1.012432
+nSV = 1124, nBSV = 1018
+*.*
+optimization finished, #iter = 1489
+obj = -197.517315, rho = -1.025696
+nSV = 477, nBSV = 104
+*.*
+optimization finished, #iter = 1660
+obj = -221.531407, rho = -1.001702
+nSV = 532, nBSV = 121
+*.*
+optimization finished, #iter = 1416
+obj = -181.522555, rho = -1.021192
+nSV = 464, nBSV = 95
+*..*
+optimization finished, #iter = 2479
+obj = -411.151527, rho = -1.023870
+nSV = 716, nBSV = 245
+...
+Warning: using -h 0 may be faster
+*...*
+optimization finished, #iter = 6687
+obj = -3200.329049, rho = 0.983258
+nSV = 3538, nBSV = 2900
+....
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 9756
+obj = -3203.065753, rho = 0.925396
+nSV = 3715, nBSV = 2750
+..
+Warning: using -h 0 may be faster
+*.*
+optimization finished, #iter = 3799
+obj = -3193.582572, rho = 0.893192
+nSV = 3380, nBSV = 3032
+...
+Warning: using -h 0 may be faster
+*...*
+optimization finished, #iter = 6098
+obj = -3200.025840, rho = 0.866605
+nSV = 3503, nBSV = 2887
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3105
+obj = -765.758505, rho = -0.961872
+nSV = 1049, nBSV = 564
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3055
+obj = -1227.360561, rho = -0.908450
+nSV = 1454, nBSV = 1024
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3675
+obj = -947.593513, rho = -0.966293
+nSV = 1268, nBSV = 695
+.
+Warning: using -h 0 may be faster
+*.*
+optimization finished, #iter = 2832
+obj = -1535.790379, rho = -0.791773
+nSV = 1740, nBSV = 1350
+*
+optimization finished, #iter = 134
+obj = -194.113225, rho = 1.014293
+nSV = 208, nBSV = 185
+*
+optimization finished, #iter = 105
+obj = -177.730859, rho = -0.739995
+nSV = 185, nBSV = 178
+*.*
+optimization finished, #iter = 314
+obj = -195.878703, rho = 0.926656
+nSV = 243, nBSV = 153
+*.*
+optimization finished, #iter = 1763
+obj = -197.678838, rho = 1.002545
+nSV = 590, nBSV = 99
+*..*
+optimization finished, #iter = 2049
+obj = -197.683861, rho = 1.017511
+nSV = 608, nBSV = 100
+*.*
+optimization finished, #iter = 1660
+obj = -197.616742, rho = 1.013463
+nSV = 547, nBSV = 101
+*.*
+optimization finished, #iter = 1644
+obj = -197.621119, rho = 0.996888
+nSV = 554, nBSV = 104
+*.*
+optimization finished, #iter = 682
+obj = -196.783547, rho = 0.960548
+nSV = 301, nBSV = 127
+*.*
+optimization finished, #iter = 921
+obj = -197.097533, rho = 1.023087
+nSV = 350, nBSV = 115
+*.*
+optimization finished, #iter = 645
+obj = -196.965447, rho = 0.976071
+nSV = 303, nBSV = 121
+*.*
+optimization finished, #iter = 905
+obj = -197.110125, rho = 1.007886
+nSV = 349, nBSV = 112
+*
+optimization finished, #iter = 141
+obj = -178.835515, rho = -0.998654
+nSV = 193, nBSV = 167
+*
+optimization finished, #iter = 307
+obj = -219.007650, rho = 0.829557
+nSV = 264, nBSV = 186
+*..*
+optimization finished, #iter = 2039
+obj = -221.663774, rho = 1.007597
+nSV = 644, nBSV = 116
+*..*
+optimization finished, #iter = 2182
+obj = -221.668883, rho = 1.017405
+nSV = 686, nBSV = 112
+*.*
+optimization finished, #iter = 1893
+obj = -221.606723, rho = 1.005329
+nSV = 606, nBSV = 116
+*..*
+optimization finished, #iter = 2071
+obj = -221.648436, rho = 1.011608
+nSV = 645, nBSV = 112
+*.*
+optimization finished, #iter = 681
+obj = -220.512350, rho = 0.932601
+nSV = 304, nBSV = 145
+*.*
+optimization finished, #iter = 905
+obj = -221.087755, rho = 0.978908
+nSV = 386, nBSV = 134
+*.*
+optimization finished, #iter = 765
+obj = -220.785376, rho = 0.979255
+nSV = 346, nBSV = 142
+*.*
+optimization finished, #iter = 1174
+obj = -221.150007, rho = 0.999373
+nSV = 401, nBSV = 123
+*.*
+optimization finished, #iter = 321
+obj = -180.187311, rho = 0.934438
+nSV = 229, nBSV = 138
+*.*
+optimization finished, #iter = 1672
+obj = -181.650756, rho = 1.032733
+nSV = 552, nBSV = 93
+*.
+Warning: using -h 0 may be faster
+*
+optimization finished, #iter = 1880
+obj = -181.702373, rho = 1.006672
+nSV = 598, nBSV = 92
+*.*
+optimization finished, #iter = 1766
+obj = -181.641564, rho = 1.029669
+nSV = 538, nBSV = 94
+*.*
+optimization finished, #iter = 1743
+obj = -181.643137, rho = 1.018170
+nSV = 556, nBSV = 91
+*.*
+optimization finished, #iter = 628
+obj = -180.769346, rho = 1.015649
+nSV = 279, nBSV = 117
+*.*
+optimization finished, #iter = 769
+obj = -181.168955, rho = 1.047332
+nSV = 323, nBSV = 107
+*.*
+optimization finished, #iter = 785
+obj = -181.189892, rho = 1.019923
+nSV = 306, nBSV = 101
+*.*
+optimization finished, #iter = 1050
+obj = -181.242532, rho = 1.046901
+nSV = 367, nBSV = 98
+.
+Warning: using -h 0 may be faster
+*..*
+optimization finished, #iter = 3514
+obj = -411.419770, rho = 1.023931
+nSV = 886, nBSV = 228
+*...*
+optimization finished, #iter = 3747
+obj = -411.501514, rho = 1.011539
+nSV = 964, nBSV = 223
+.
+Warning: using -h 0 may be faster
+*.*
+optimization finished, #iter = 2978
+obj = -411.348777, rho = 1.021873
+nSV = 835, nBSV = 244
+*...*
+optimization finished, #iter = 3133
+obj = -411.394146, rho = 0.996404
+nSV = 841, nBSV = 238
+*
+optimization finished, #iter = 536
+obj = -407.428396, rho = 0.959160
+nSV = 464, nBSV = 359
+*.*
+optimization finished, #iter = 1032
+obj = -409.662280, rho = 1.086541
+nSV = 533, nBSV = 317
+*.*
+optimization finished, #iter = 836
+obj = -409.395633, rho = 1.022774
+nSV = 515, nBSV = 331
+*.*
+optimization finished, #iter = 1349
+obj = -410.246076, rho = 1.042143
+nSV = 586, nBSV = 302
+....*
+optimization finished, #iter = 4608
+obj = -6723.563940, rho = 0.697211
+nSV = 6896, nBSV = 6676
+..
+Warning: using -h 0 may be faster
+*.*
+optimization finished, #iter = 3272
+obj = -4954.623733, rho = -0.911934
+nSV = 5101, nBSV = 4931
+...
+Warning: using -h 0 may be faster
+*
+optimization finished, #iter = 3224
+obj = -5633.421744, rho = -1.017860
+nSV = 5893, nBSV = 5823
+.
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 6414
+obj = -767.205613, rho = -1.013419
+nSV = 1449, nBSV = 453
+..
+Warning: using -h 0 may be faster
+*......*.*
+optimization finished, #iter = 8548
+obj = -1230.512575, rho = -0.962007
+nSV = 1900, nBSV = 795
+..
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 7074
+obj = -948.935887, rho = -0.987235
+nSV = 1611, nBSV = 595
+..
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 7999
+obj = -1539.791842, rho = -0.936984
+nSV = 2104, nBSV = 1124
+...
+Warning: using -h 0 may be faster
+*.*
+optimization finished, #iter = 4444
+obj = -4980.345927, rho = -0.935423
+nSV = 5193, nBSV = 4840
+...
+Warning: using -h 0 may be faster
+*.
+Warning: using -h 0 may be faster
+*
+optimization finished, #iter = 3977
+obj = -5865.665940, rho = -1.290194
+nSV = 6069, nBSV = 5902
+.
+Warning: using -h 0 may be faster
+*......*.*
+optimization finished, #iter = 7275
+obj = -767.282635, rho = -1.005072
+nSV = 1516, nBSV = 439
+..
+Warning: using -h 0 may be faster
+*........*
+optimization finished, #iter = 10744
+obj = -1230.826330, rho = -0.969370
+nSV = 2177, nBSV = 720
+.
+Warning: using -h 0 may be faster
+*.......*
+optimization finished, #iter = 8118
+obj = -949.007516, rho = -0.976664
+nSV = 1705, nBSV = 565
+..
+Warning: using -h 0 may be faster
+*.......*
+optimization finished, #iter = 9162
+obj = -1540.068984, rho = -0.943828
+nSV = 2188, nBSV = 1093
+.[CV] END ....................C=1, gamma=scale, kernel=linear; total time= 1.7min
+..*
+optimization finished, #iter = 3426
+obj = -4975.968364, rho = 0.544256
+nSV = 5119, nBSV = 4925
+.
+Warning: using -h 0 may be faster
+*...*
+optimization finished, #iter = 4644
+obj = -766.767060, rho = -0.979672
+nSV = 1206, nBSV = 490
+.
+Warning: using -h 0 may be faster
+*....*
+optimization finished, #iter = 5749
+obj = -1229.680016, rho = -0.943495
+nSV = 1658, nBSV = 898
+.
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 6012
+obj = -948.628562, rho = -0.986545
+nSV = 1446, nBSV = 614
+..
+Warning: using -h 0 may be faster
+*...*
+optimization finished, #iter = 5783
+obj = -1539.004007, rho = -0.928101
+nSV = 1940, nBSV = 1207
+.
+Warning: using -h 0 may be faster
+*....*
+optimization finished, #iter = 5301
+obj = -766.928277, rho = -0.995529
+nSV = 1288, nBSV = 480
+..
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 7015
+obj = -1230.061306, rho = -0.954930
+nSV = 1746, nBSV = 850
+.
+Warning: using -h 0 may be faster
+*.....*
+optimization finished, #iter = 6172
+obj = -948.689787, rho = -0.986786
+nSV = 1499, nBSV = 615
+..
+Warning: using -h 0 may be faster
+*.....*.*
+optimization finished, #iter = 7627
+obj = -1539.558947, rho = -0.942570
+nSV = 2040, nBSV = 1143
+*
+optimization finished, #iter = 870
+obj = -762.117448, rho = 0.957913
+nSV = 843, nBSV = 696
+*
+optimization finished, #iter = 541
+obj = -755.308866, rho = 0.986747
+nSV = 801, nBSV = 738
+*.*
+optimization finished, #iter = 1022
+obj = -760.962105, rho = 1.059487
+nSV = 858, nBSV = 686
+*
+optimization finished, #iter = 661
+obj = -937.086672, rho = -1.036830
+nSV = 988, nBSV = 916
+*
+optimization finished, #iter = 763
+obj = -1185.967434, rho = 0.486125
+nSV = 1250, nBSV = 1209
+*.*
+optimization finished, #iter = 1260
+obj = -943.650706, rho = 1.009620
+nSV = 1045, nBSV = 844
+Total nSV = 19934
+[CV] END ..................C=0.1, gamma=scale, kernel=linear; total time= 2.2min
+[CV] END ..................C=0.1, gamma=scale, kernel=linear; total time= 2.3min
+[CV] END ..................C=0.1, gamma=scale, kernel=linear; total time= 2.4min
+[CV] END ...................C=0.1, gamma=auto, kernel=linear; total time= 2.4min
+[CV] END ...................C=0.1, gamma=auto, kernel=linear; total time= 2.4min
+[CV] END ...................C=0.1, gamma=auto, kernel=linear; total time= 2.5min
+[CV] END ........................C=1, gamma=auto, kernel=rbf; total time= 2.5min
+[CV] END ......................C=0.1, gamma=auto, kernel=rbf; total time= 2.5min
+[CV] END .....................C=1, gamma=auto, kernel=linear; total time= 2.5min
+[CV] END ......................C=0.1, gamma=auto, kernel=rbf; total time= 2.6min
+[CV] END ....................C=1, gamma=scale, kernel=linear; total time= 2.6min
+[CV] END ....................C=1, gamma=scale, kernel=linear; total time= 2.6min
+[CV] END ........................C=1, gamma=auto, kernel=rbf; total time= 2.6min
+[CV] END .......................C=10, gamma=auto, kernel=rbf; total time= 2.6min
+[CV] END ......................C=0.1, gamma=auto, kernel=rbf; total time= 2.6min
+[CV] END .......................C=10, gamma=auto, kernel=rbf; total time= 2.6min
+[CV] END .....................C=1, gamma=auto, kernel=linear; total time= 2.6min
+[CV] END .....................C=1, gamma=auto, kernel=linear; total time= 2.6min
+[CV] END .......................C=1, gamma=scale, kernel=rbf; total time= 2.6min
+[CV] END .......................C=1, gamma=scale, kernel=rbf; total time= 2.6min
+[CV] END .......................C=10, gamma=auto, kernel=rbf; total time= 2.6min
+[CV] END .....................C=0.1, gamma=scale, kernel=rbf; total time= 2.6min
+[CV] END ......................C=10, gamma=scale, kernel=rbf; total time= 2.6min
+[CV] END .......................C=1, gamma=scale, kernel=rbf; total time= 2.6min
+[CV] END ......................C=10, gamma=scale, kernel=rbf; total time= 2.6min
+[CV] END ........................C=1, gamma=auto, kernel=rbf; total time= 2.6min
+[CV] END .....................C=0.1, gamma=scale, kernel=rbf; total time= 2.7min
+[CV] END .....................C=0.1, gamma=scale, kernel=rbf; total time= 2.7min
+[CV] END ......................C=10, gamma=scale, kernel=rbf; total time= 2.7min
+[CV] END ....................C=10, gamma=auto, kernel=linear; total time= 2.7min
+[CV] END ....................C=10, gamma=auto, kernel=linear; total time= 2.7min
+[CV] END ....................C=10, gamma=auto, kernel=linear; total time= 2.7min
+[CV] END ...................C=10, gamma=scale, kernel=linear; total time= 2.7min
+[CV] END ...................C=10, gamma=scale, kernel=linear; total time= 2.7min
+[CV] END ...................C=10, gamma=scale, kernel=linear; total time= 2.7min
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/opt/conda/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+GridSearchCV completed in 173.4s!
+Best parameters found: {'C': 10, 'gamma': 'auto', 'kernel': 'rbf'}
+Best cross-validation score: 0.2176
+
+Checking best parameters against target (C=1, kernel='rbf', gamma='auto')...
+WARNING: Best parameters do not match target specification. Forcing target parameters for final model.
+
+Training final SVC model with C=1, kernel='rbf', gamma='auto'...
+[LibSVM]Final SVC training completed in 250.5s!
+Saving final SVC model to /data/best_svc_model.joblib...
+Evaluating final SVC model on test set...
+
+--- Classification Report (Stage 5 - SVC Optimized Model) ---
+              precision    recall  f1-score   support
+
+        ENFJ       0.00      0.00      0.00       771
+        ENFP       0.00      0.00      0.00      2745
+        ENTJ       0.00      0.00      0.00       936
+        ENTP       0.00      0.00      0.00      2804
+        ESFJ       0.00      0.00      0.00       174
+        ESFP       0.00      0.00      0.00       193
+        ESTJ       0.00      0.00      0.00       159
+        ESTP       0.00      0.00      0.00       359
+        INFJ       0.09      0.00      0.00      5934
+        INFP       0.21      0.98      0.35      7337
+        INTJ       0.00      0.00      0.00      4387
+        INTP       0.21      0.05      0.08      5242
+        ISFJ       0.00      0.00      0.00       671
+        ISFP       0.00      0.00      0.00      1078
+        ISTJ       0.00      0.00      0.00       830
+        ISTP       0.00      0.00      0.00      1348
+
+    accuracy                           0.21     34968
+   macro avg       0.03      0.06      0.03     34968
+weighted avg       0.09      0.21      0.09     34968
+
+==================================================
+SUCCESS: train_svc.py completed in 858.1s
+
+==================================================
+MBTI Training Master Pipeline Finished Successfully!
+==================================================
+Total Pipeline Runtime: 18.72 minutes
+Execution time per step:
+ - train_baseline.py: 39.7s (0.66m)
+ - train_finetune.py: 92.5s (1.54m)
+ - train_binary.py: 132.7s (2.21m)
+ - train_svc.py: 858.1s (14.30m)
+==================================================

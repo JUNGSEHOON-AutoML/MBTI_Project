@@ -60,25 +60,51 @@ def main():
         print("Kaggle API will look for the credentials file ~/.kaggle/kaggle.json.")
         print("If download fails, please set the variables or mount a valid kaggle.json file.")
         
-    # Initialize and authenticate Kaggle API
-    try:
-        from kaggle.api.kaggle_api_extended import KaggleApi
-        api = KaggleApi()
-        api.authenticate()
-        print("Kaggle API authenticated successfully.")
-    except Exception as e:
-        print(f"ERROR: Kaggle API authentication failed: {e}")
-        print("Please check your API token credentials.")
-        sys.exit(1)
+    # Kaggle API will be initialized on-demand if local backups are missing
+    print("Checking for datasets...")
         
     # 3. Download and Extract datasets
+    # Check if local backups exist in the workspace to bypass Kaggle API download
+    local_zip_paths = {
+        'datasnaek/mbti-type': '/workspace/MBTI_Personality_Prediction/mbti_1.csv.zip',
+        'zeyadkhalid/mbti-personality-types-500-dataset': '/workspace/MBTI_Personality_Prediction/ForumMessages.csv.zip'
+    }
+    
     datasets = [
-        ('datasnaek/mbti-type', 'datasnaek/mbti-type (Dataset 1)'),
-        ('zeyadkhalid/mbti-personality-types-500-dataset', 'zeyadkhalid/mbti-personality-types-500-dataset (Dataset 2)')
+        ('datasnaek/mbti-type', 'datasnaek/mbti-type (Dataset 1)', 'mbti_1.csv.zip'),
+        ('zeyadkhalid/mbti-personality-types-500-dataset', 'zeyadkhalid/mbti-personality-types-500-dataset (Dataset 2)', 'ForumMessages.csv.zip')
     ]
     
-    for dataset_id, label in datasets:
-        print(f"\nDownloading {label}...")
+    api = None # Lazy initialization
+
+    for dataset_id, label, zip_name in datasets:
+        local_zip = local_zip_paths.get(dataset_id)
+        if local_zip and os.path.exists(local_zip):
+            print(f"\nFound local backup for {label} at {local_zip}. Copying and extracting...")
+            try:
+                import shutil
+                import zipfile
+                shutil.copy(local_zip, os.path.join(target_dir, zip_name))
+                with zipfile.ZipFile(os.path.join(target_dir, zip_name), 'r') as zip_ref:
+                    zip_ref.extractall(target_dir)
+                os.remove(os.path.join(target_dir, zip_name))
+                print(f"Successfully extracted {label} from local backup to {target_dir}")
+                continue
+            except Exception as e:
+                print(f"Failed to extract local backup: {e}. Trying Kaggle API...")
+
+        print(f"\nDownloading {label} via Kaggle API...")
+        if api is None:
+            try:
+                from kaggle.api.kaggle_api_extended import KaggleApi
+                api = KaggleApi()
+                api.authenticate()
+                print("Kaggle API authenticated successfully.")
+            except Exception as auth_err:
+                print(f"ERROR: Kaggle API authentication failed: {auth_err}")
+                print("Please check your API token credentials.")
+                sys.exit(1)
+                
         try:
             # dataset_download_files automatically downloads and extracts if unzip=True
             api.dataset_download_files(dataset_id, path=target_dir, unzip=True, quiet=False)

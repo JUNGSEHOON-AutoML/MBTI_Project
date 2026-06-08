@@ -19,3 +19,6 @@ Thumbs.db
 *.joblib
 *.pkl
 *.pth
+*.pt
+outputs/
+
